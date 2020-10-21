@@ -1,37 +1,35 @@
 package entity
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 //Transaction is an entity for transactions data storage
 type Transaction struct {
-	transactionID uint64
-	account       *Account
-	operationType *OperationType
-	amount        float64
-	eventDate     time.Time
+	ID            uint64
+	Account       Account
+	OperationType OperationType
+	Amount        float64
+	CreatedAt     time.Time
 }
 
-//ID returns the transaction ID
-func (t Transaction) ID() uint64 {
-	return t.transactionID
-}
+//NewTransaction creates a new instance of Transaction
+func NewTransaction(accountID uint64, operationTypeID uint64, amount float64) (*Transaction, error) {
+	operationType := OperationType(operationTypeID)
+	if !operationType.IsValid() {
+		return nil, fmt.Errorf("Invalid operation type '%d'", operationTypeID)
+	}
 
-//Account returns the account of the transaction
-func (t Transaction) Account() *Account {
-	return t.account
-}
+	account := Account{ID: accountID}
 
-//OperationType returns the transaction's operation type
-func (t Transaction) OperationType() *OperationType {
-	return t.operationType
-}
+	if operationType.IsDebit() {
+		amount = -amount
+	}
 
-//Amount returns the amount of the transaction
-func (t Transaction) Amount() float64 {
-	return t.amount
-}
-
-//EventDate returns the time that the transaction ocurred
-func (t Transaction) EventDate() time.Time {
-	return t.eventDate
+	return &Transaction{
+		Account:       account,
+		OperationType: operationType,
+		Amount:        amount,
+	}, nil
 }
