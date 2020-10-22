@@ -5,20 +5,21 @@ import (
 	"time"
 )
 
-//Transaction is an entity for transactions data storage
+// Transaction is an entity for transactions data storage
 type Transaction struct {
-	ID            uint64
-	Account       Account
-	OperationType OperationType
-	Amount        float64
-	CreatedAt     time.Time
+	ID              uint64
+	AccountID       uint64
+	Account         Account
+	OperationTypeID OperationType
+	Amount          float64
+	CreatedAt       time.Time
 }
 
-//NewTransaction creates a new instance of Transaction
+// NewTransaction creates a new Transaction struct
 func NewTransaction(accountID uint64, operationTypeID uint64, amount float64) (*Transaction, error) {
-	operationType := OperationType(operationTypeID)
-	if !operationType.IsValid() {
-		return nil, fmt.Errorf("Invalid operation type '%d'", operationTypeID)
+	operationType, err := NewOperationType(operationTypeID)
+	if err != nil {
+		return nil, fmt.Errorf("NewTransaction error: %v", err)
 	}
 
 	account := Account{ID: accountID}
@@ -28,8 +29,8 @@ func NewTransaction(accountID uint64, operationTypeID uint64, amount float64) (*
 	}
 
 	return &Transaction{
-		Account:       account,
-		OperationType: operationType,
-		Amount:        amount,
+		Account:         account,
+		OperationTypeID: operationType,
+		Amount:          amount,
 	}, nil
 }

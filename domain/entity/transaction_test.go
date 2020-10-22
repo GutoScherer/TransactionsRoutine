@@ -6,7 +6,7 @@ import (
 )
 
 func TestA(t *testing.T) {
-	transaction, err := NewTransaction(1, 40, 10)
+	transaction, err := NewTransaction(1, 4, 10)
 	if err != nil {
 		t.Log(err)
 		t.FailNow()

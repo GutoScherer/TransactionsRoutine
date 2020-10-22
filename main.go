@@ -1,30 +1,21 @@
 package main
 
 import (
-	"net/http"
-
+	"github.com/GutoScherer/TransactionsRoutine/api"
+	"github.com/GutoScherer/TransactionsRoutine/api/http"
+	"github.com/GutoScherer/TransactionsRoutine/infra/database/mysql"
 	"github.com/gorilla/mux"
 )
 
 func main() {
+	config := mysql.NewConfig("root", "admin123", "TransactionsRoutineDatabase", "3306", "transaction_routine")
+	db, err := mysql.NewGormConnection(config)
+	if err != nil {
+		//panic(err)
+	}
+
 	router := mux.NewRouter()
-	router.HandleFunc("/accounts", createAccountHandler).Methods("POST")
 
-	router.HandleFunc("/accounts/{accountId}", retrieveAccountInfoHandler).Methods("GET")
-
-	router.HandleFunc("/transactions", createTransactionHandler).Methods("POST")
-
-	http.ListenAndServe(":8080", router)
-}
-
-func createAccountHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("TODO: Create account route"))
-}
-
-func retrieveAccountInfoHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("TODO: Retrieve account informations route"))
-}
-
-func createTransactionHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("TODO: Create transaction route"))
+	var httpServer api.Server = http.NewServer(router, db)
+	httpServer.ListenAndServe(8080)
 }

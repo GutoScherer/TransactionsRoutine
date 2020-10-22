@@ -1,5 +1,9 @@
 package entity
 
+import (
+	"fmt"
+)
+
 // OperationType is an enum that represents the operation types of transactions
 //
 // Valid values are:
@@ -18,6 +22,7 @@ const (
 	Saque
 	//Pagamento representa um pagamento
 	Pagamento
+	end
 )
 
 var types = [...]string{
@@ -27,13 +32,23 @@ var types = [...]string{
 	"PAGAMENTO",
 }
 
+// NewOperationType creates a new operation type
+func NewOperationType(operationTypeID uint64) (OperationType, error) {
+	ot := OperationType(operationTypeID)
+	if !ot.IsValid() {
+		return 0, fmt.Errorf("Invalid operation type '%d'", operationTypeID)
+	}
+
+	return ot, nil
+}
+
 func (ot OperationType) String() string {
 	return types[ot-1]
 }
 
 //IsValid checks if the operation type is valid
 func (ot OperationType) IsValid() bool {
-	return ot <= Pagamento
+	return ot < end
 }
 
 //IsDebit checks if the operation type is a debit operation
