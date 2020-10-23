@@ -2,6 +2,8 @@ package entity
 
 import (
 	"fmt"
+
+	"github.com/GutoScherer/TransactionsRoutine/domain"
 )
 
 // OperationType is an enum that represents the operation types of transactions
@@ -36,7 +38,7 @@ var types = [...]string{
 func NewOperationType(operationTypeID uint64) (OperationType, error) {
 	ot := OperationType(operationTypeID)
 	if !ot.IsValid() {
-		return 0, fmt.Errorf("invalid operation type '%d'", operationTypeID)
+		return 0, domain.NewDomainError(fmt.Sprintf("invalid operation type '%d'", operationTypeID))
 	}
 
 	return ot, nil

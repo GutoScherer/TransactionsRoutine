@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/GutoScherer/TransactionsRoutine/domain"
 	"github.com/GutoScherer/TransactionsRoutine/usecase/presenter"
 	"github.com/GutoScherer/TransactionsRoutine/usecase/repository"
 )
@@ -53,6 +54,11 @@ func (h CreateTransaction) HandlerFunc(rw http.ResponseWriter, r *http.Request) 
 	output, err := h.transactionCreator.Create(createTransactionRequest.AccountID, createTransactionRequest.OperationTypeID, createTransactionRequest.Amount)
 	if err != nil {
 		h.logger.Println("error creating transaction:", err)
+
+		if _, ok := err.(*domain.Error); ok {
+			rw.WriteHeader(http.StatusUnprocessableEntity)
+			return
+		}
 
 		if errors.Is(err, repository.ErrInvalidData) || errors.Is(err, repository.ErrForeignKeyConstraint) {
 			rw.WriteHeader(http.StatusUnprocessableEntity)
