@@ -7,12 +7,12 @@ import (
 
 // Transaction is an entity for transactions data storage
 type Transaction struct {
-	ID              uint64
-	AccountID       uint64
-	Account         Account
-	OperationTypeID OperationType
-	Amount          float64
-	CreatedAt       time.Time
+	ID            uint64
+	AccountID     uint64
+	Account       Account
+	OperationType OperationType `gorm:"column:operation_type_id"`
+	Amount        float64
+	CreatedAt     time.Time
 }
 
 // NewTransaction creates a new Transaction struct
@@ -29,8 +29,8 @@ func NewTransaction(accountID uint64, operationTypeID uint64, amount float64) (*
 	}
 
 	return &Transaction{
-		Account:         account,
-		OperationTypeID: operationType,
-		Amount:          amount,
+		Account:       account,
+		OperationType: operationType,
+		Amount:        amount,
 	}, nil
 }

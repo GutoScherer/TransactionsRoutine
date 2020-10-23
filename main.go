@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/GutoScherer/TransactionsRoutine/api"
 	"github.com/GutoScherer/TransactionsRoutine/api/http"
 	"github.com/GutoScherer/TransactionsRoutine/infra/database/mysql"
@@ -11,7 +13,9 @@ func main() {
 	config := mysql.NewConfig("root", "admin123", "TransactionsRoutineDatabase", "3306", "transaction_routine")
 	db, err := mysql.NewGormConnection(config)
 	if err != nil {
-		//panic(err)
+		// TODO: error handling
+		fmt.Println("")
+		return
 	}
 
 	router := mux.NewRouter()
