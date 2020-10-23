@@ -8,7 +8,7 @@ CREATE TABLE `accounts` (
 CREATE TABLE `transactions` (
   `id` int NOT NULL AUTO_INCREMENT,
   `account_id` int DEFAULT NULL,
-  `operation_type_id` int DEFAULT NULL,
+  `operation_type_id` enum('1','2','3','4') DEFAULT NULL,
   `amount` int DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),

@@ -1,7 +1,10 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/GutoScherer/TransactionsRoutine/domain/entity"
+	"github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -18,5 +21,11 @@ func NewTransactionRepository(db *gorm.DB) *TransactionRepository {
 // Save store the transaction in the database
 func (repo TransactionRepository) Save(transaction *entity.Transaction) (*entity.Transaction, error) {
 	err := repo.db.Create(transaction).Error
-	return transaction, err
+	if err != nil {
+		fmt.Println(err)
+		if mysqlError, ok := err.(*mysql.MySQLError); ok {
+			return nil, buildRepositoryError(mysqlError)
+		}
+	}
+	return transaction, nil
 }

@@ -2,9 +2,12 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
+	"log"
 	"net/http"
 
 	"github.com/GutoScherer/TransactionsRoutine/usecase/presenter"
+	"github.com/GutoScherer/TransactionsRoutine/usecase/repository"
 )
 
 type createTransactionRequest struct {
@@ -21,11 +24,15 @@ type TransactionCreator interface {
 // CreateTransaction represents the http handler struct to create an transaction
 type CreateTransaction struct {
 	transactionCreator TransactionCreator
+	logger             *log.Logger
 }
 
 // NewCreateTransaction creates a new CreateTransaction struct
-func NewCreateTransaction(tc TransactionCreator) *CreateTransaction {
-	return &CreateTransaction{transactionCreator: tc}
+func NewCreateTransaction(tc TransactionCreator, logger *log.Logger) *CreateTransaction {
+	return &CreateTransaction{
+		transactionCreator: tc,
+		logger:             logger,
+	}
 }
 
 // HandlerFunc is the http handler function used by the server
@@ -34,16 +41,23 @@ func (h CreateTransaction) HandlerFunc(rw http.ResponseWriter, r *http.Request) 
 
 	err := json.NewDecoder(r.Body).Decode(&createTransactionRequest)
 	if err != nil {
-		// TODO: Error handling
-		http.Error(rw, err.Error(), http.StatusBadRequest)
+		h.logger.Println("invalid request body:", err)
+
+		output := map[string]string{"error": "invalid JSON body"}
+		rw.Header().Set("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(rw).Encode(output)
 		return
 	}
 
 	output, err := h.transactionCreator.Create(createTransactionRequest.AccountID, createTransactionRequest.OperationTypeID, createTransactionRequest.Amount)
 	if err != nil {
-		// TODO: Error handling
-		http.Error(rw, err.Error(), http.StatusBadRequest)
-		return
+		h.logger.Println("error creating transaction:", err)
+
+		if errors.Is(err, repository.ErrInvalidData) || errors.Is(err, repository.ErrForeignKeyConstraint) {
+			rw.WriteHeader(http.StatusUnprocessableEntity)
+			return
+		}
 	}
 
 	rw.Header().Set("Content-Type", "application/json")

@@ -36,7 +36,7 @@ var types = [...]string{
 func NewOperationType(operationTypeID uint64) (OperationType, error) {
 	ot := OperationType(operationTypeID)
 	if !ot.IsValid() {
-		return 0, fmt.Errorf("Invalid operation type '%d'", operationTypeID)
+		return 0, fmt.Errorf("invalid operation type '%d'", operationTypeID)
 	}
 
 	return ot, nil

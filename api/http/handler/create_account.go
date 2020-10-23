@@ -2,9 +2,12 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
+	"log"
 	"net/http"
 
 	"github.com/GutoScherer/TransactionsRoutine/usecase/presenter"
+	"github.com/GutoScherer/TransactionsRoutine/usecase/repository"
 )
 
 type createAccountRequest struct {
@@ -19,11 +22,15 @@ type AccountCreator interface {
 // CreateAccount represents the http handler struct to create an account
 type CreateAccount struct {
 	accountCreator AccountCreator
+	logger         *log.Logger
 }
 
 // NewCreateAccount creates a new CreateAccount struct
-func NewCreateAccount(ac AccountCreator) *CreateAccount {
-	return &CreateAccount{accountCreator: ac}
+func NewCreateAccount(ac AccountCreator, logger *log.Logger) *CreateAccount {
+	return &CreateAccount{
+		accountCreator: ac,
+		logger:         logger,
+	}
 }
 
 // HandlerFunc is the http handler function used by the server
@@ -32,16 +39,31 @@ func (h CreateAccount) HandlerFunc(rw http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&createAccRequest)
 	if err != nil {
-		// TODO: Error handling
-		http.Error(rw, err.Error(), http.StatusBadRequest)
+		h.logger.Println("invalid request body:", err)
+
+		output := map[string]string{"error": "invalid JSON body"}
+		rw.Header().Set("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(rw).Encode(output)
 		return
 	}
 
 	output, err := h.accountCreator.Create(createAccRequest.DocumentNumber)
 
 	if err != nil {
-		// TODO: Error handling
-		http.Error(rw, err.Error(), http.StatusBadRequest)
+		h.logger.Println("error creating account:", err)
+
+		if errors.Is(err, repository.ErrDuplicatedEntry) {
+			rw.WriteHeader(http.StatusConflict)
+			return
+		}
+
+		if errors.Is(err, repository.ErrInvalidData) {
+			rw.WriteHeader(http.StatusUnprocessableEntity)
+			return
+		}
+
+		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 

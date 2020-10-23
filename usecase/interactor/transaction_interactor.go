@@ -6,19 +6,26 @@ import (
 	"github.com/GutoScherer/TransactionsRoutine/usecase/presenter"
 )
 
-type transactionInteractor struct {
-	TransactionRepository repository.TransactionRepository
-	TransactionPresenter  presenter.TransactionPresenter
-}
-
 // TransactionInteractor represents an interactor for transaction usecases
 type TransactionInteractor interface {
 	Create(accountID, operationTypeID uint64, amount float64) (*presenter.CreateTransactionOutput, error)
 }
 
+type transactionInteractor struct {
+	TransactionRepository repository.TransactionRepository
+	TransactionPresenter  presenter.TransactionPresenter
+}
+
+type transactionInteractorMock struct{}
+
 // NewTransactionInteractor creates a new TransactionInteractor implementation
 func NewTransactionInteractor(repo repository.TransactionRepository, tp presenter.TransactionPresenter) TransactionInteractor {
 	return &transactionInteractor{TransactionRepository: repo, TransactionPresenter: tp}
+}
+
+// NewTransactionInteractorMock creates a new TransactionInteractor implementation for unit tests
+func NewTransactionInteractorMock() TransactionInteractor {
+	return &transactionInteractorMock{}
 }
 
 // Create creates and store a transaction on database
@@ -34,4 +41,9 @@ func (ti transactionInteractor) Create(accountID, operationTypeID uint64, amount
 	}
 
 	return ti.TransactionPresenter.CreateTransactionOutput(transaction), nil
+}
+
+// Create mocks the Create behavior
+func (tim transactionInteractorMock) Create(accountID, operationTypeID uint64, amount float64) (*presenter.CreateTransactionOutput, error) {
+	return nil, nil
 }

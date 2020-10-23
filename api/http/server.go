@@ -1,6 +1,7 @@
 package http
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/GutoScherer/TransactionsRoutine/api/http/handler"
@@ -15,11 +16,16 @@ import (
 type Server struct {
 	router *mux.Router
 	db     *gorm.DB
+	logger *log.Logger
 }
 
 // NewServer creates a new Server struct
-func NewServer(router *mux.Router, db *gorm.DB) *Server {
-	return &Server{router: router, db: db}
+func NewServer(router *mux.Router, db *gorm.DB, logger *log.Logger) *Server {
+	return &Server{
+		router: router,
+		db:     db,
+		logger: logger,
+	}
 }
 
 // ListenAndServe listens on the specified port and exposes the server
@@ -27,6 +33,8 @@ func (s Server) ListenAndServe(port int) {
 	s.router.HandleFunc("/accounts/{accountID}", s.retrieveAccountInfoHandler()).Methods("GET")
 	s.router.HandleFunc("/accounts", s.createAccountHandler()).Methods("POST")
 	s.router.HandleFunc("/transactions", s.createTransactionHandler()).Methods("POST")
+
+	s.logger.Println(`HTTP server listening on port`, port)
 	http.ListenAndServe(":8080", s.router)
 }
 
@@ -35,7 +43,7 @@ func (s Server) retrieveAccountInfoHandler() http.HandlerFunc {
 	presenter := presenter.NewAccountPresenter()
 	interactor := interactor.NewAccountInteractor(repo, presenter)
 
-	handler := handler.NewRetrieveAccount(interactor)
+	handler := handler.NewRetrieveAccount(interactor, s.logger)
 	return handler.HandlerFunc
 }
 
@@ -44,7 +52,7 @@ func (s Server) createAccountHandler() http.HandlerFunc {
 	presenter := presenter.NewAccountPresenter()
 	interactor := interactor.NewAccountInteractor(repo, presenter)
 
-	handler := handler.NewCreateAccount(interactor)
+	handler := handler.NewCreateAccount(interactor, s.logger)
 	return handler.HandlerFunc
 }
 
@@ -53,6 +61,6 @@ func (s Server) createTransactionHandler() http.HandlerFunc {
 	presenter := presenter.NewTransactionPresenter()
 	interactor := interactor.NewTransactionInteractor(repo, presenter)
 
-	handler := handler.NewCreateTransaction(interactor)
+	handler := handler.NewCreateTransaction(interactor, s.logger)
 	return handler.HandlerFunc
 }

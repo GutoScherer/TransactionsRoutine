@@ -6,12 +6,12 @@ import (
 	"github.com/GutoScherer/TransactionsRoutine/domain/entity"
 )
 
-type transactionPresenter struct{}
-
 // TransactionPresenter represents the output port for transaction usecases
 type TransactionPresenter interface {
 	CreateTransactionOutput(*entity.Transaction) *CreateTransactionOutput
 }
+
+type transactionPresenter struct{}
 
 // NewTransactionPresenter creates a new TransactionPresenter implementation
 func NewTransactionPresenter() TransactionPresenter {

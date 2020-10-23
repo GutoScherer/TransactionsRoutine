@@ -19,7 +19,7 @@ type Transaction struct {
 func NewTransaction(accountID uint64, operationTypeID uint64, amount float64) (*Transaction, error) {
 	operationType, err := NewOperationType(operationTypeID)
 	if err != nil {
-		return nil, fmt.Errorf("NewTransaction error: %v", err)
+		return nil, fmt.Errorf("new transaction error: %v", err)
 	}
 
 	account := Account{ID: accountID}

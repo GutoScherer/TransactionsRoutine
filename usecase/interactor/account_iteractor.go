@@ -6,20 +6,27 @@ import (
 	"github.com/GutoScherer/TransactionsRoutine/usecase/presenter"
 )
 
-type accountInteractor struct {
-	AccountRepository repository.AccountRepository
-	AccountPresenter  presenter.AccountPresenter
-}
-
 // AccountInteractor represents an interactor for account usecases
 type AccountInteractor interface {
 	RetrieveByID(accountID uint64) (*presenter.RetrieveAccountOutput, error)
 	Create(documentNumber string) (*presenter.CreateAccountOutput, error)
 }
 
+type accountInteractor struct {
+	AccountRepository repository.AccountRepository
+	AccountPresenter  presenter.AccountPresenter
+}
+
+type accountInteractorMock struct{}
+
 // NewAccountInteractor creates a new AccountInteractor implementation
 func NewAccountInteractor(repo repository.AccountRepository, ap presenter.AccountPresenter) AccountInteractor {
 	return &accountInteractor{AccountRepository: repo, AccountPresenter: ap}
+}
+
+// NewAccountInteractorMock creates a new AccountInteractor implementation for unit tests
+func NewAccountInteractorMock() AccountInteractor {
+	return &accountInteractorMock{}
 }
 
 // RetrieveByID finds one account by its primary key
@@ -42,4 +49,14 @@ func (ai accountInteractor) Create(documentNumber string) (*presenter.CreateAcco
 	}
 
 	return ai.AccountPresenter.CreateAccountOutput(acc), nil
+}
+
+// RetrieveByID mocks the RetrieveByID behavior
+func (aim accountInteractorMock) RetrieveByID(accountID uint64) (*presenter.RetrieveAccountOutput, error) {
+	return nil, nil
+}
+
+// Create mocks the Create behavior
+func (aim accountInteractorMock) Create(documentNumber string) (*presenter.CreateAccountOutput, error) {
+	return nil, nil
 }

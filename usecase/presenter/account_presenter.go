@@ -4,19 +4,20 @@ import (
 	"github.com/GutoScherer/TransactionsRoutine/domain/entity"
 )
 
-type accountPresenter struct{}
-
 // AccountPresenter represents the output port for account usecases
 type AccountPresenter interface {
 	CreateAccountOutput(*entity.Account) *CreateAccountOutput
 	RetrieveAccountOutput(*entity.Account) *RetrieveAccountOutput
 }
 
+type accountPresenter struct{}
+
 // NewAccountPresenter creates a new AccountPresenter implementation
 func NewAccountPresenter() AccountPresenter {
 	return &accountPresenter{}
 }
 
+// CreateAccountOutput creates the output for the CreateAccount usecase
 func (ap accountPresenter) CreateAccountOutput(acc *entity.Account) *CreateAccountOutput {
 	return &CreateAccountOutput{
 		AccountID:      acc.ID,
@@ -24,6 +25,7 @@ func (ap accountPresenter) CreateAccountOutput(acc *entity.Account) *CreateAccou
 	}
 }
 
+// RetrieveAccountOutput creates the output for the RetrieveAccount usecase
 func (ap accountPresenter) RetrieveAccountOutput(acc *entity.Account) *RetrieveAccountOutput {
 	return &RetrieveAccountOutput{
 		AccountID:      acc.ID,

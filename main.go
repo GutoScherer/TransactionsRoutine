@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"os"
 
 	"github.com/GutoScherer/TransactionsRoutine/api"
 	"github.com/GutoScherer/TransactionsRoutine/api/http"
@@ -10,16 +11,24 @@ import (
 )
 
 func main() {
-	config := mysql.NewConfig("root", "admin123", "TransactionsRoutineDatabase", "3306", "transaction_routine")
+	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
+	logger.Println("Initiating app")
+
+	config := mysql.NewConfig(
+		os.Getenv(`MYSQL_USER`),
+		os.Getenv(`MYSQL_PASSWORD`),
+		os.Getenv(`MYSQL_HOST`),
+		os.Getenv(`MYSQL_PORT`),
+		os.Getenv(`MYSQL_DATABASE`),
+	)
 	db, err := mysql.NewGormConnection(config)
 	if err != nil {
-		// TODO: error handling
-		fmt.Println("")
+		logger.Fatalln("error connecting to database:", err.Error())
 		return
 	}
 
 	router := mux.NewRouter()
 
-	var httpServer api.Server = http.NewServer(router, db)
+	var httpServer api.Server = http.NewServer(router, db, logger)
 	httpServer.ListenAndServe(8080)
 }
