@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -35,13 +34,13 @@ func NewRetrieveAccount(ar AccountRetriever, logger *log.Logger) *RetrieveAccoun
 func (h RetrieveAccount) HandlerFunc(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	accountID, err := strconv.Atoi(vars["accountID"])
+	responseWriter := newResponseWriter(rw)
+
 	if err != nil {
 		h.logger.Println("invalid accountID:", err)
 
 		output := map[string]string{"error": "Invalid accountID"}
-		rw.Header().Set("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(rw).Encode(output)
+		responseWriter.outputResponse(http.StatusBadRequest, output)
 		return
 	}
 
@@ -49,16 +48,14 @@ func (h RetrieveAccount) HandlerFunc(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.logger.Println("error retrieving account:", err)
 		if errors.Is(err, repository.ErrRegisterNotFound) {
-			rw.WriteHeader(http.StatusNotFound)
+			responseWriter.outputResponse(http.StatusNotFound, nil)
 			return
 		}
 
-		rw.WriteHeader(http.StatusInternalServerError)
+		responseWriter.outputResponse(http.StatusInternalServerError, nil)
 		return
 	}
 
-	rw.Header().Set("Content-Type", "application/json")
-	rw.WriteHeader(http.StatusOK)
-	json.NewEncoder(rw).Encode(output)
+	responseWriter.outputResponse(http.StatusOK, output)
 	return
 }

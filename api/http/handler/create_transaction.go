@@ -39,15 +39,14 @@ func NewCreateTransaction(tc TransactionCreator, logger *log.Logger) *CreateTran
 // HandlerFunc is the http handler function used by the server
 func (h CreateTransaction) HandlerFunc(rw http.ResponseWriter, r *http.Request) {
 	var createTransactionRequest createTransactionRequest
+	responseWriter := newResponseWriter(rw)
 
 	err := json.NewDecoder(r.Body).Decode(&createTransactionRequest)
 	if err != nil {
 		h.logger.Println("invalid request body:", err)
 
 		output := map[string]string{"error": "invalid JSON body"}
-		rw.Header().Set("Content-Type", "application/json")
-		rw.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(rw).Encode(output)
+		responseWriter.outputResponse(http.StatusBadRequest, output)
 		return
 	}
 
@@ -56,17 +55,18 @@ func (h CreateTransaction) HandlerFunc(rw http.ResponseWriter, r *http.Request) 
 		h.logger.Println("error creating transaction:", err)
 
 		if _, ok := err.(*domain.Error); ok {
-			rw.WriteHeader(http.StatusUnprocessableEntity)
+			responseWriter.outputResponse(http.StatusUnprocessableEntity, nil)
 			return
 		}
 
 		if errors.Is(err, repository.ErrInvalidData) || errors.Is(err, repository.ErrForeignKeyConstraint) {
-			rw.WriteHeader(http.StatusUnprocessableEntity)
+			responseWriter.outputResponse(http.StatusUnprocessableEntity, nil)
 			return
 		}
+
+		responseWriter.outputResponse(http.StatusInternalServerError, nil)
 	}
 
-	rw.Header().Set("Content-Type", "application/json")
-	rw.WriteHeader(http.StatusCreated)
-	json.NewEncoder(rw).Encode(output)
+	responseWriter.outputResponse(http.StatusCreated, output)
+	return
 }
