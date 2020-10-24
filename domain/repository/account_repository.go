@@ -8,19 +8,30 @@ type AccountRepository interface {
 	FindOneByID(uint64) (*entity.Account, error)
 }
 
-type accountRepositoryMock struct{}
+type accountRepositoryMock struct {
+	acc *entity.Account
+	err error
+}
 
 // NewAccountRepositoryMock creates a new AccountRepository implementation for unit tests
-func NewAccountRepositoryMock() AccountRepository {
-	return &accountRepositoryMock{}
+func NewAccountRepositoryMock(acc *entity.Account, err error) AccountRepository {
+	return &accountRepositoryMock{acc: acc, err: err}
 }
 
 // Save mocks the Save behavior
 func (arm accountRepositoryMock) Save(acc *entity.Account) (*entity.Account, error) {
-	return nil, nil
+	if arm.err != nil {
+		return nil, arm.err
+	}
+
+	return arm.acc, nil
 }
 
 // FindOneByID mocks the FindOneByID behavior
 func (arm accountRepositoryMock) FindOneByID(id uint64) (*entity.Account, error) {
-	return nil, nil
+	if arm.err != nil {
+		return nil, arm.err
+	}
+
+	return arm.acc, nil
 }

@@ -7,14 +7,21 @@ type TransactionRepository interface {
 	Save(*entity.Transaction) (*entity.Transaction, error)
 }
 
-type transactionRepositoryMock struct{}
+type transactionRepositoryMock struct {
+	transaction *entity.Transaction
+	err         error
+}
 
 // NewTransactionRepositoryMock creates a new TransactionRepository implementation for unit tests
-func NewTransactionRepositoryMock() TransactionRepository {
-	return &transactionRepositoryMock{}
+func NewTransactionRepositoryMock(t *entity.Transaction, err error) TransactionRepository {
+	return &transactionRepositoryMock{transaction: t, err: err}
 }
 
 // Save mocks the Save behavior
 func (trm transactionRepositoryMock) Save(_ *entity.Transaction) (*entity.Transaction, error) {
-	return nil, nil
+	if trm.err != nil {
+		return nil, trm.err
+	}
+
+	return trm.transaction, nil
 }

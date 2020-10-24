@@ -17,7 +17,11 @@ type accountInteractor struct {
 	AccountPresenter  presenter.AccountPresenter
 }
 
-type accountInteractorMock struct{}
+type accountInteractorMock struct {
+	createAccountOutput   *presenter.CreateAccountOutput
+	retrieveAccountOutput *presenter.RetrieveAccountOutput
+	err                   error
+}
 
 // NewAccountInteractor creates a new AccountInteractor implementation
 func NewAccountInteractor(repo repository.AccountRepository, ap presenter.AccountPresenter) AccountInteractor {
@@ -25,8 +29,8 @@ func NewAccountInteractor(repo repository.AccountRepository, ap presenter.Accoun
 }
 
 // NewAccountInteractorMock creates a new AccountInteractor implementation for unit tests
-func NewAccountInteractorMock() AccountInteractor {
-	return &accountInteractorMock{}
+func NewAccountInteractorMock(cao *presenter.CreateAccountOutput, rao *presenter.RetrieveAccountOutput, err error) AccountInteractor {
+	return &accountInteractorMock{createAccountOutput: cao, retrieveAccountOutput: rao, err: err}
 }
 
 // RetrieveByID finds one account by its primary key
@@ -51,12 +55,20 @@ func (ai accountInteractor) Create(documentNumber string) (*presenter.CreateAcco
 	return ai.AccountPresenter.CreateAccountOutput(acc), nil
 }
 
-// RetrieveByID mocks the RetrieveByID behavior
+// RetrieveByID mocks the RetrieveByID behavior of the AccountInteractor
 func (aim accountInteractorMock) RetrieveByID(accountID uint64) (*presenter.RetrieveAccountOutput, error) {
-	return nil, nil
+	if aim.err != nil {
+		return nil, aim.err
+	}
+
+	return aim.retrieveAccountOutput, nil
 }
 
-// Create mocks the Create behavior
+// Create mocks the Create behavior of the AccountInteractor
 func (aim accountInteractorMock) Create(documentNumber string) (*presenter.CreateAccountOutput, error) {
-	return nil, nil
+	if aim.err != nil {
+		return nil, aim.err
+	}
+
+	return aim.createAccountOutput, nil
 }
