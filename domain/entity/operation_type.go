@@ -58,7 +58,7 @@ func (ot OperationType) IsDebit() bool {
 	switch ot {
 	case Pagamento:
 		return false
-	default:
-		return true
 	}
+
+	return true
 }
