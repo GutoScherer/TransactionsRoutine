@@ -16,19 +16,9 @@ type transactionInteractor struct {
 	TransactionPresenter  presenter.TransactionPresenter
 }
 
-type transactionInteractorMock struct {
-	output *presenter.CreateTransactionOutput
-	err    error
-}
-
 // NewTransactionInteractor creates a new TransactionInteractor implementation
 func NewTransactionInteractor(repo repository.TransactionRepository, tp presenter.TransactionPresenter) TransactionInteractor {
 	return &transactionInteractor{TransactionRepository: repo, TransactionPresenter: tp}
-}
-
-// NewTransactionInteractorMock creates a new TransactionInteractor implementation for unit tests
-func NewTransactionInteractorMock() TransactionInteractor {
-	return &transactionInteractorMock{}
 }
 
 // Create creates and store a transaction on database
@@ -44,13 +34,4 @@ func (ti transactionInteractor) Create(accountID, operationTypeID uint64, amount
 	}
 
 	return ti.TransactionPresenter.CreateTransactionOutput(transaction), nil
-}
-
-// Create mocks the Create behavior of TransactionInteractor
-func (tim transactionInteractorMock) Create(accountID, operationTypeID uint64, amount float64) (*presenter.CreateTransactionOutput, error) {
-	if tim.err != nil {
-		return nil, tim.err
-	}
-
-	return tim.output, nil
 }

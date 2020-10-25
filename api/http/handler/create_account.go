@@ -66,6 +66,25 @@ func (h CreateAccount) HandlerFunc(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseWriter.outputResponse(http.StatusInternalServerError, output)
+	responseWriter.outputResponse(http.StatusCreated, output)
 	return
+}
+
+type accountCreatorMock struct {
+	createAccountOutput *presenter.CreateAccountOutput
+	err                 error
+}
+
+// NewAccountCreatorMock creates a new AccountCreator implementation for unit tests
+func NewAccountCreatorMock(cao *presenter.CreateAccountOutput, err error) AccountCreator {
+	return &accountCreatorMock{createAccountOutput: cao, err: err}
+}
+
+// Create mocks the Create behavior of the AccountCreator
+func (acm accountCreatorMock) Create(documentNumber string) (*presenter.CreateAccountOutput, error) {
+	if acm.err != nil {
+		return nil, acm.err
+	}
+
+	return acm.createAccountOutput, nil
 }

@@ -59,3 +59,22 @@ func (h RetrieveAccount) HandlerFunc(rw http.ResponseWriter, r *http.Request) {
 	responseWriter.outputResponse(http.StatusOK, output)
 	return
 }
+
+type accountRetrieverMock struct {
+	retrieveAccountOutput *presenter.RetrieveAccountOutput
+	err                   error
+}
+
+// NewAccountRetrieverMock creates a new AccountRetriever implementation for unit tests
+func NewAccountRetrieverMock(rao *presenter.RetrieveAccountOutput, err error) AccountRetriever {
+	return &accountRetrieverMock{retrieveAccountOutput: rao, err: err}
+}
+
+// RetrieveByID mocks the RetrieveByID behavior of the AccountRetriever
+func (arm accountRetrieverMock) RetrieveByID(accountID uint64) (*presenter.RetrieveAccountOutput, error) {
+	if arm.err != nil {
+		return nil, arm.err
+	}
+
+	return arm.retrieveAccountOutput, nil
+}

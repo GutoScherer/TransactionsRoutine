@@ -70,3 +70,25 @@ func (h CreateTransaction) HandlerFunc(rw http.ResponseWriter, r *http.Request) 
 	responseWriter.outputResponse(http.StatusCreated, output)
 	return
 }
+
+type transactionCreatorMock struct {
+	output *presenter.CreateTransactionOutput
+	err    error
+}
+
+// NewTransactionCreatorMock creates a new TransactionCreator implementation for unit tests
+func NewTransactionCreatorMock(output *presenter.CreateTransactionOutput, err error) TransactionCreator {
+	return &transactionCreatorMock{
+		output: output,
+		err:    err,
+	}
+}
+
+// Create mocks the Create behavior of TransactionInteractor
+func (tcm transactionCreatorMock) Create(accountID, operationTypeID uint64, amount float64) (*presenter.CreateTransactionOutput, error) {
+	if tcm.err != nil {
+		return nil, tcm.err
+	}
+
+	return tcm.output, nil
+}
