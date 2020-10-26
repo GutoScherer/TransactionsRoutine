@@ -120,7 +120,7 @@ Content-Type: application/json
 Content-Length: 111
 
 {
-    "account_id": 2,
+    "account_id": 1,
     "operation_type": "COMPRA A VISTA",
     "amount": -100.5,
     "created_at": "2020-10-26T01:31:56.3622751Z"
