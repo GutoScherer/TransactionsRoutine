@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -35,7 +36,7 @@ func (s Server) ListenAndServe(port int) {
 	s.router.HandleFunc("/transactions", s.createTransactionHandler()).Methods("POST")
 
 	s.logger.Println(`HTTP server listening on port`, port)
-	http.ListenAndServe(":8080", s.router)
+	http.ListenAndServe(fmt.Sprintf(":%d", port), s.router)
 }
 
 func (s Server) retrieveAccountInfoHandler() http.HandlerFunc {

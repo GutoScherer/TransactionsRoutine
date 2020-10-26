@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/GutoScherer/TransactionsRoutine/api"
 	"github.com/GutoScherer/TransactionsRoutine/api/http"
@@ -30,5 +31,11 @@ func main() {
 	router := mux.NewRouter()
 
 	var httpServer api.Server = http.NewServer(router, db, logger)
-	httpServer.ListenAndServe(8080)
+	port, err := strconv.Atoi(os.Getenv(`HTTP_API_PORT`))
+	if err != nil {
+		logger.Fatalln("invalid HTTP API port:", err.Error())
+		return
+	}
+
+	httpServer.ListenAndServe(port)
 }
