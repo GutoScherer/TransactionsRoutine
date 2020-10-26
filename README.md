@@ -18,7 +18,7 @@ Por motivos de segurança, dados de configuração da aplicação devem ficar co
 2. Executar ***make start*** para subir todos os containeres Docker necessários para executar a aplicação.
 
 ## Testes
-Após subir a aplicação utilizando oa comandos mostrados na seção anterior, executar ***make test*** para rodar todos os testes existentes.
+Após subir a aplicação utilizando os comandos mostrados na seção anterior, executar ***make test*** para rodar todos os testes existentes.
 
 ## REST API
 
