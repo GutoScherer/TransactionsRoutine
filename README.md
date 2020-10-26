@@ -1,4 +1,4 @@
-# TransactionsRoutine
+# Transactions Routine
 Transactions Routine é uma aplicação para simular transações bancárias, como compra, saque e pagamento.
 
 A aplicação foi desenvolvida utilizando a linguagem GoLang e conceitos de Clean Architecture descritos por Robert C. Martin em seu livro "Clean Architecture: A Craftsman's Guide to Software Structure". Tais conceitos de clean architeture permitem escrever um código organizado, encapsulando a lógica de negócio e mantendo componentes desacoplados, o que torna possível desenvolver uma aplicação testável, independente de interface, banco de dados ou qualquer agente externo.
